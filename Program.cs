@@ -8,11 +8,16 @@ namespace GetCurrentMethodName
 {
     internal class Program
     {
-        static void Main(string[] args)
+        private static void Main()
         {
-            // Использование MethodBase.GetCurrentMethod()
+            // Использование метода MethodBase.GetCurrentMethod()
             string currentMethod = MethodBase.GetCurrentMethod()?.Name;
             Console.WriteLine("Текущий метод " + currentMethod);
+
+            MethodBase m = MethodBase.GetCurrentMethod();
+            if (m != null)
+                if (m.ReflectedType != null)
+                    Console.WriteLine("Класс {0}. Текущий метод {1}", m.ReflectedType.Name, m.Name);
 
             // Использование StackTrace Учебный класс (System.Diagnostics)
             StackTrace stackTrace = new StackTrace();
@@ -30,13 +35,77 @@ namespace GetCurrentMethodName
             // Использование оператора nameof
             Unique();
 
+            // Использование метода Type.GetMethod
+            MethodInfo mInfo;
+            // Получить MethodA(int i, int j)
+            mInfo = typeof(Program)
+                .GetMethod("MethodA",
+                BindingFlags.Public | BindingFlags.Instance,
+                null,
+                CallingConventions.Any,
+                new[] { typeof(int), typeof(int) },
+                null);
+            Console.WriteLine("Найденный метод: {0}", mInfo);
+
+            // Получить MethodA(int[] i)
+            mInfo = typeof(Program)
+                .GetMethod("MethodA",
+                BindingFlags.Public | BindingFlags.Instance,
+                null,
+                CallingConventions.Any,
+                new[] { typeof(int[]) },
+                null);
+            Console.WriteLine("Найденный метод: {0}", mInfo);
+
+            // Получить MethodA(int* i)
+            mInfo = typeof(Program)
+                .GetMethod("MethodA",
+                BindingFlags.Public | BindingFlags.Instance,
+                null,
+                CallingConventions.Any,
+                new[] { typeof(int).MakePointerType() },
+                null);
+            Console.WriteLine("Найденный метод: {0}", mInfo);
+
+            // Получить MethodA(ref int r)
+            mInfo = typeof(Program)
+                .GetMethod("MethodA",
+                BindingFlags.Public | BindingFlags.Instance,
+                null,
+                CallingConventions.Any,
+                new[] { typeof(int).MakeByRefType() },
+                null);
+            Console.WriteLine("Найденный метод: {0}", mInfo);
+
+            // Получить MethodA(int i, out int o)
+            mInfo = typeof(Program)
+                .GetMethod("MethodA",
+                BindingFlags.Public | BindingFlags.Instance,
+                null,
+                CallingConventions.Any,
+                new[] { typeof(int), typeof(int).MakeByRefType() },
+                null);
+            Console.WriteLine("Найденный метод: {0}", mInfo);
         }
 
-        public static string GetCurrentMethodName()
+        // Методы получения:
+
+        public void MethodA(int i, int j) { }
+
+        public void MethodA(int[] i) { }
+
+        public unsafe void MethodA(int* i) { }
+
+        public void MethodA(ref int r) { }
+
+        // Метод, который принимает параметр out:
+        public void MethodA(int i, out int o) { o = 100; }
+
+        private static string GetCurrentMethodName()
         {
-            StackTrace stackTrace = new StackTrace();
-            StackFrame stackFrame = stackTrace.GetFrame(1);
-            return stackFrame.GetMethod().Name;
+            StackTrace stackTrace3 = new StackTrace();
+            StackFrame stackFrame3 = stackTrace3.GetFrame(1);
+            return stackFrame3.GetMethod().Name;
         }
 
         private static void Unique()
