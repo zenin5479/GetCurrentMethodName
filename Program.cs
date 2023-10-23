@@ -10,16 +10,9 @@ namespace GetCurrentMethodName
     {
         private static void Main()
         {
-            // Использование метода MethodBase.GetCurrentMethod()
-            string currentMethod = MethodBase.GetCurrentMethod()?.Name;
-            Console.WriteLine("Текущий метод " + currentMethod);
-
-            MethodBase m = MethodBase.GetCurrentMethod();
-            if (m != null)
-                if (m.ReflectedType != null)
-                    Console.WriteLine("Класс {0}. Текущий метод {1}", m.ReflectedType.Name, m.Name);
-
             // Использование StackTrace Учебный класс (System.Diagnostics)
+            Console.WriteLine("Метод {0}: Begin", new StackTrace(0, true).GetFrame(0).GetMethod().Name);
+            // или
             StackTrace stackTrace = new StackTrace();
             StackFrame stackFrame = stackTrace.GetFrame(0);
             string currentMethod2 = stackFrame.GetMethod().Name;
@@ -31,6 +24,15 @@ namespace GetCurrentMethodName
             // или
             string currentMethod4 = GetCurrentMethodName();
             Console.WriteLine("Текущий метод " + currentMethod4);
+
+            // Использование метода MethodBase.GetCurrentMethod()
+            string currentMethod = MethodBase.GetCurrentMethod()?.Name;
+            Console.WriteLine("Текущий метод " + currentMethod);
+            // или
+            MethodBase m = MethodBase.GetCurrentMethod();
+            if (m != null)
+                if (m.ReflectedType != null)
+                    Console.WriteLine("Класс {0}. Текущий метод {1}", m.ReflectedType.Name, m.Name);
 
             // Использование оператора nameof
             Unique();
@@ -86,6 +88,11 @@ namespace GetCurrentMethodName
                 new[] { typeof(int), typeof(int).MakeByRefType() },
                 null);
             Console.WriteLine("Найденный метод: {0}", mInfo);
+
+            Console.WriteLine("Метод {0}: End", new StackTrace(0, true).GetFrame(0).GetMethod().Name);
+            Console.ForegroundColor = ConsoleColor.Red;
+            Console.WriteLine("Нажмите любую клавишу");
+            Console.Read();
         }
 
         // Методы получения:
